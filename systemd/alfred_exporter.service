@@ -1,0 +1,9 @@
+[Unit]
+Description=Alfred prometheus exporter
+
+[Service]
+Type=simple
+ExecStart=/opt/alfred_exporter.py -p 9205 -s /var/run/alfred.sock
+
+[Install]
+WantedBy=multi-user.target
