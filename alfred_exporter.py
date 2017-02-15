@@ -104,13 +104,14 @@ class metrics(BaseHTTPRequestHandler):
                         except KeyError:
                                 pass
                         try:
-                                for neighbour in config3[mac]['batadv'].values()[0]['neighbours']:
-                                        if neighbours[neighbour] != '':
-                                                neigh_name = re.sub('[!@$:]', '', neighbours[neighbour])
-                                                batadv_neigh = 'ffnode_stats_neighbours{node_id="'+str(mac)+'",hostname="'+str(config2[mac]['hostname'])+',neighbour="'+str(neigh_name)+'"} '+str(config3[mac]['batadv'].values()[0]['neighbours'][neighbour]['tq'])
-                                                batadv_neigh = re.sub('[!@$:]', '', batadv_neigh)
-                                                self.wfile.write(batadv_neigh)
-                                                self.wfile.write('\n')
+				for interface in config3[mac]['batadv']:
+                                        for neighbour in config3[mac]['batadv'][interface]['neighbours']:
+                                                if neighbours[neighbour] != '':
+                                                        neigh_name = re.sub('[!@$:]', '', neighbours[neighbour])
+                                                        batadv_neigh = 'ffnode_stats_neighbours{node_id="'+str(mac)+'",hostname="'+str(config2[mac]['hostname'])+',neighbour="'+str(neigh_name)+'"} '+str(config3[mac]['batadv'][interface]['neighbours'][neighbour]['tq'])
+                                                        batadv_neigh = re.sub('[!@$:]', '', batadv_neigh)
+                                                        self.wfile.write(batadv_neigh)
+                                                        self.wfile.write('\n')
                         except KeyError:
                                 pass
                 return
