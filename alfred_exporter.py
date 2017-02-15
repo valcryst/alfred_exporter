@@ -16,83 +16,102 @@ class metrics(BaseHTTPRequestHandler):
                 # fetch alfred data
                 call159 = subprocess.check_output(['alfred-json','-z','-f','json','-r','159','-s',options.socket_path])
                 call158 = subprocess.check_output(['alfred-json','-z','-f','json','-r','158','-s',options.socket_path])
+		call160 = subprocess.check_output(['alfred-json','-z','-f','json','-r','160','-s',options.socket_path])
                 # convert json
                 config = json.loads(call159.decode('utf-8'))
                 config2 = json.loads(call158.decode('utf-8'))
+		config3 = json.loads(call160.decode('utf-8'))
                 # webserver displays
                 self.wfile.write('# A.L.F.R.E.D. Prometheus exporter - Metrics from mesh networks' + '\n')
                 self.wfile.write('#' + '\n')
-                for key in config:
+                for mac in config:
                         try:
-                                cpu_load = 'ffnode_stats_load{node_id="'+str(key)+'",hostname="'+str(config2[key]['hostname'])+'"} '+str(config[key]['loadavg'])
+                                cpu_load = 'ffnode_stats_load{node_id="'+str(mac)+'",hostname="'+str(config2[mac]['hostname'])+'"} '+str(config[mac]['loadavg'])
                                 cpu_load = re.sub('[!@$:]', '', cpu_load)
                                 self.wfile.write(cpu_load)
                                 self.wfile.write('\n')
                         except KeyError:
                                 pass
                         try:
-                                mem_total = 'ffnode_stats_memory_total{node_id="'+str(key)+'",hostname="'+str(config2[key]['hostname'])+'"} '+str(config[key]['memory']['total'])
+                                mem_total = 'ffnode_stats_memory_total{node_id="'+str(mac)+'",hostname="'+str(config2[mac]['hostname'])+'"} '+str(config[mac]['memory']['total'])
                                 mem_total = re.sub('[!@$:]', '', mem_total)
                                 self.wfile.write(mem_total)
                                 self.wfile.write('\n')
                         except KeyError:
                                 pass
                         try:
-                                mem_free = 'ffnode_stats_memory_free{node_id="'+str(key)+'",hostname="'+str(config2[key]['hostname'])+'"} '+str(config[key]['memory']['free'])
+                                mem_free = 'ffnode_stats_memory_free{node_id="'+str(mac)+'",hostname="'+str(config2[mac]['hostname'])+'"} '+str(config[mac]['memory']['free'])
                                 mem_free = re.sub('[!@$:]', '', mem_free)
                                 self.wfile.write(mem_free)
                                 self.wfile.write('\n')
                         except KeyError:
                                 pass
                         try:
-                                clients_total = 'ffnode_stats_clients{node_id="'+str(key)+'",hostname="'+str(config2[key]['hostname'])+'"} '+str(config[key]['clients']['total'])
+                                clients_total = 'ffnode_stats_clients{node_id="'+str(mac)+'",hostname="'+str(config2[mac]['hostname'])+'"} '+str(config[mac]['clients']['total'])
                                 clients_total = re.sub('[!@$:]', '', clients_total)
                                 self.wfile.write(clients_total)
                                 self.wfile.write('\n')
                         except KeyError:
                                 pass
                         try:
-                                node_uptime = 'ffnode_stats_uptime{node_id="'+str(key)+'",hostname="'+str(config2[key]['hostname'])+'"} '+str(config[key]['uptime'])
+                                node_uptime = 'ffnode_stats_uptime{node_id="'+str(mac)+'",hostname="'+str(config2[mac]['hostname'])+'"} '+str(config[mac]['uptime'])
                                 node_uptime = re.sub('[!@$:]', '', node_uptime)
                                 self.wfile.write(node_uptime)
                                 self.wfile.write('\n')
                         except KeyError:
                                 pass
                         try:
-                                net_receive = 'ffnode_network_bytes_receive{node_id="'+str(key)+'",hostname="'+str(config2[key]['hostname'])+'"} '+str(config[key]['traffic']['rx']['bytes'])
+                                net_receive = 'ffnode_network_bytes_receive{node_id="'+str(mac)+'",hostname="'+str(config2[mac]['hostname'])+'"} '+str(config[mac]['traffic']['rx']['bytes'])
                                 net_receive = re.sub('[!@$:]', '', net_receive)
                                 self.wfile.write(net_receive)
                                 self.wfile.write('\n')
                         except KeyError:
                                 pass
                         try:
-                                net_transmit = 'ffnode_network_bytes_transmit{node_id="'+str(key)+'",hostname="'+str(config2[key]['hostname'])+'"} '+str(config[key]['traffic']['tx']['bytes'])
+                                net_transmit = 'ffnode_network_bytes_transmit{node_id="'+str(mac)+'",hostname="'+str(config2[mac]['hostname'])+'"} '+str(config[mac]['traffic']['tx']['bytes'])
                                 net_transmit = re.sub('[!@$:]', '', net_transmit)
                                 self.wfile.write(net_transmit)
                                 self.wfile.write('\n')
                         except KeyError:
                                 pass
                         try:
-                                mgmt_receive = 'ffnode_network_bytes_mgmt_receive{node_id="'+str(key)+'",hostname="'+str(config2[key]['hostname'])+'"} '+str(config[key]['traffic']['mgmt_rx']['bytes'])
+                                mgmt_receive = 'ffnode_network_bytes_mgmt_receive{node_id="'+str(mac)+'",hostname="'+str(config2[mac]['hostname'])+'"} '+str(config[mac]['traffic']['mgmt_rx']['bytes'])
                                 mgmt_receive = re.sub('[!@$:]', '', mgmt_receive)
                                 self.wfile.write(mgmt_receive)
                                 self.wfile.write('\n')
                         except KeyError:
                                 pass
                         try:
-                                mgmt_transmit = 'ffnode_network_bytes_mgmt_transmit{node_id="'+str(key)+'",hostname="'+str(config2[key]['hostname'])+'"} '+str(config[key]['traffic']['mgmt_tx']['bytes'])
+                                mgmt_transmit = 'ffnode_network_bytes_mgmt_transmit{node_id="'+str(mac)+'",hostname="'+str(config2[mac]['hostname'])+'"} '+str(config[mac]['traffic']['mgmt_tx']['bytes'])
                                 mgmt_transmit = re.sub('[!@$:]', '', mgmt_transmit)
                                 self.wfile.write(mgmt_transmit)
                                 self.wfile.write('\n')
                         except KeyError:
                                 pass
                         try:
-                                net_forward = 'ffnode_network_bytes_forward{node_id="'+str(key)+'",hostname="'+str(config2[key]['hostname'])+'"} '+str(config[key]['traffic']['forward']['bytes'])
+                                net_forward = 'ffnode_network_bytes_forward{node_id="'+str(mac)+'",hostname="'+str(config2[mac]['hostname'])+'"} '+str(config[mac]['traffic']['forward']['bytes'])
                                 net_forward = re.sub('[!@$:]', '', net_forward)
                                 self.wfile.write(net_forward)
                                 self.wfile.write('\n')
                         except KeyError:
                                 pass
+			try:
+				for neighbour in config3[mac]['batadv'].values()[0]['neighbours']:
+					neigh_name = 'unbekannt'
+					for mac_neighbour in config2:
+						try:
+							if config2[mac_neighbour]['network']['mesh_interfaces'][0] == neighbour:
+								neigh_name = str(config2[mac_neighbour]['hostname'])
+						except KeyError:
+							pass
+					neigh_name = re.sub('[!@$:]', '', neigh_name)
+					if neigh_name != 'unbekannt':
+						batadv_neigh = 'ffnode_stats_neighbours{node_id="'+str(mac)+'",hostname="'+str(config2[mac]['hostname'])+',neighbour="'+str(neigh_name)+'"} '+str(config3[mac]['batadv'].values()[0]['neighbours'][neighbour]['tq'])
+						batadv_neigh = re.sub('[!@$:]', '', batadv_neigh)
+						self.wfile.write(batadv_neigh)
+						self.wfile.write('\n')
+			except KeyError:
+				pass
                 return
                 self.wfile.write("</html>")
                 self.wfile.close()
