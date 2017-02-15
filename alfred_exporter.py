@@ -16,14 +16,22 @@ class metrics(BaseHTTPRequestHandler):
                 # fetch alfred data
                 call159 = subprocess.check_output(['alfred-json','-z','-f','json','-r','159','-s',options.socket_path])
                 call158 = subprocess.check_output(['alfred-json','-z','-f','json','-r','158','-s',options.socket_path])
-		call160 = subprocess.check_output(['alfred-json','-z','-f','json','-r','160','-s',options.socket_path])
+                call160 = subprocess.check_output(['alfred-json','-z','-f','json','-r','160','-s',options.socket_path])
                 # convert json
                 config = json.loads(call159.decode('utf-8'))
                 config2 = json.loads(call158.decode('utf-8'))
-		config3 = json.loads(call160.decode('utf-8'))
+                config3 = json.loads(call160.decode('utf-8'))
                 # webserver displays
                 self.wfile.write('# A.L.F.R.E.D. Prometheus exporter - Metrics from mesh networks' + '\n')
                 self.wfile.write('#' + '\n')
+
+                neighbours = {}
+
+                for mac in config2:
+                        if 'mesh_interfaces' in config2[mac]['network']:
+                                for mesh in config2[mac]['network']['mesh_interfaces']:
+                                        neighbours[mesh] = str(config2[mac]['hostname'])
+
                 for mac in config:
                         try:
                                 cpu_load = 'ffnode_stats_load{node_id="'+str(mac)+'",hostname="'+str(config2[mac]['hostname'])+'"} '+str(config[mac]['loadavg'])
@@ -95,23 +103,16 @@ class metrics(BaseHTTPRequestHandler):
                                 self.wfile.write('\n')
                         except KeyError:
                                 pass
-			try:
-				for neighbour in config3[mac]['batadv'].values()[0]['neighbours']:
-					neigh_name = 'unbekannt'
-					for mac_neighbour in config2:
-						try:
-							if config2[mac_neighbour]['network']['mesh_interfaces'][0] == neighbour:
-								neigh_name = str(config2[mac_neighbour]['hostname'])
-						except KeyError:
-							pass
-					neigh_name = re.sub('[!@$:]', '', neigh_name)
-					if neigh_name != 'unbekannt':
-						batadv_neigh = 'ffnode_stats_neighbours{node_id="'+str(mac)+'",hostname="'+str(config2[mac]['hostname'])+',neighbour="'+str(neigh_name)+'"} '+str(config3[mac]['batadv'].values()[0]['neighbours'][neighbour]['tq'])
-						batadv_neigh = re.sub('[!@$:]', '', batadv_neigh)
-						self.wfile.write(batadv_neigh)
-						self.wfile.write('\n')
-			except KeyError:
-				pass
+                        try:
+                                for neighbour in config3[mac]['batadv'].values()[0]['neighbours']:
+                                        if neighbours[neighbour] != '':
+                                                neigh_name = re.sub('[!@$:]', '', neighbours[neighbour])
+                                                batadv_neigh = 'ffnode_stats_neighbours{node_id="'+str(mac)+'",hostname="'+str(config2[mac]['hostname'])+',neighbour="'+str(neigh_name)+'"} '+str(config3[mac]['batadv'].values()[0]['neighbours'][neighbour]['tq'])
+                                                batadv_neigh = re.sub('[!@$:]', '', batadv_neigh)
+                                                self.wfile.write(batadv_neigh)
+                                                self.wfile.write('\n')
+                        except KeyError:
+                                pass
                 return
                 self.wfile.write("</html>")
                 self.wfile.close()
@@ -138,3 +139,4 @@ try:
 except KeyboardInterrupt:
         print '^C received, shutting down the web server'
         server.socket.close()
+
