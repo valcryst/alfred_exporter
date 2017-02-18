@@ -31,6 +31,7 @@ class metrics(BaseHTTPRequestHandler):
 			try:
 	                        if 'mesh_interfaces' in config2[mac]['network']:
         	                        for mesh in config2[mac]['network']['mesh_interfaces']:
+						neighbours[mesh] = {}
                 	                        neighbours[mesh]['hostname'] = str(config2[mac]['hostname'])
 						neighbours[mesh]['neigh_id'] = config2[mac]['node_id']
 			except KeyError:
